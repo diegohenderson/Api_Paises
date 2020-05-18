@@ -19,10 +19,34 @@ namespace Api.WebAPi.Controllers
 
             this.context = context;
         }
+
         [HttpGet]
         public ActionResult<IEnumerable<Pais>> Get()
         {
             return context.Paises.ToList();
+        }
+        //nuevo con lamda
+        [HttpGet("{id}", Name ="ObtenerPaisPorId")]
+        public ActionResult<Pais> Get(int id)
+        {
+            var pais = context.Paises.FirstOrDefault(p => p.Id == id);
+            if (pais == null)
+            {
+                return NotFound();
+
+            }
+            return pais;
+        }
+
+
+        [HttpPost]
+        public ActionResult<Pais>Post([FromBody]Pais pais)
+        {
+            context.Paises.Add(pais);
+            context.SaveChanges();
+            //return new CreatedAtRouteResult("obtenerPaisPorId", new { id = pais.Id }, pais);
+            return pais;
+
         }
     }
 }
