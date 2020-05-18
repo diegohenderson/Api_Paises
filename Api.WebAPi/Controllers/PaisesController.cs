@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Api.WebAPi.Data;
 using Api.WebAPi.Data.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Api.WebAPi.Controllers
 {
@@ -26,7 +27,7 @@ namespace Api.WebAPi.Controllers
             return context.Paises.ToList();
         }
         //nuevo con lamda
-        [HttpGet("{id}", Name ="ObtenerPaisPorId")]
+        [HttpGet("{id}", Name = "ObtenerPaisPorId")]
         public ActionResult<Pais> Get(int id)
         {
             var pais = context.Paises.FirstOrDefault(p => p.Id == id);
@@ -40,13 +41,38 @@ namespace Api.WebAPi.Controllers
 
 
         [HttpPost]
-        public ActionResult<Pais>Post([FromBody]Pais pais)
+        public ActionResult<Pais> Post([FromBody]Pais pais)
         {
             context.Paises.Add(pais);
             context.SaveChanges();
-            //return new CreatedAtRouteResult("obtenerPaisPorId", new { id = pais.Id }, pais);
-            return pais;
+            return new CreatedAtRouteResult("obtenerPaisPorId", new { id = pais.Id }, pais);
+            //return pais;
 
+        }
+        //put
+        [HttpPut("{id}")]
+        public ActionResult<Pais> Put(int id, [FromBody] Pais pais)
+        {
+            if (id!= pais.Id)
+            {
+                return BadRequest();
+            }
+            context.Entry(pais).State = EntityState.Modified;
+            context.SaveChanges();
+            return Ok();
+
+        }
+        [HttpDelete("{id}")]
+        public ActionResult<Pais>Delete(int id)
+        {
+            var pais = context.Paises.FirstOrDefault(p => p.Id == id);
+            if (pais==null)     
+            {
+                return NotFound();
+            }
+            context.Paises.Remove(pais);
+            context.SaveChanges();
+            return Ok();
         }
     }
 }
