@@ -41,10 +41,13 @@ namespace Api.WebAPi.Controllers
 
 
         [HttpPost]
-        public ActionResult<Pais> Post([FromBody]Pais pais)
+        //public ActionResult<Pais> Post([FromBody]Pais pais)
+        public async Task<ActionResult<Pais>> Post([FromBody]Pais pais)
         {
-            context.Paises.Add(pais);
-            context.SaveChanges();
+            //context.Paises.Add(pais);
+            await context.Paises.AddAsync(pais);
+            //context.SaveChanges();
+            await context.SaveChangesAsync();
             return new CreatedAtRouteResult("obtenerPaisPorId", new { id = pais.Id }, pais);
             //return pais;
 

@@ -10,9 +10,10 @@ namespace Api.WebAPi.Data.Entities
     {
         public int Id { get; set; }
         [Required]
-        public string Codigo { get; set; }
+        public string CodProv { get; set; }
         [Required]
-        public string NombreProv { get; set; }
+        public string NomProv { get; set; }
+        public int PaisId { get; set; }
         public Pais Pais { get; set; }
     }
 }
