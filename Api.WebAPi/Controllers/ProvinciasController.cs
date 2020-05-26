@@ -27,9 +27,9 @@ namespace Api.WebAPi.Controllers
             return context.Provincias.Include(p => p.Pais).ToList();
         }
 
-        
-        [HttpGet("{id}", Name = "ObtenerProvinciaPorId")]
-        public ActionResult<Provincia> Get(int id)
+        //api/provincias/ProvbyId/id. [int]
+        [HttpGet("ProvBy/{id}", Name = "ProvById")]
+        public ActionResult<Provincia> GetProvById(int id)
         {
             var provincia = context.Provincias.FirstOrDefault(p => p.Id == id);
             if (provincia == null)
@@ -39,6 +39,19 @@ namespace Api.WebAPi.Controllers
             }
             return provincia;
         }
+        //api/provincias/GetProvByCod/cod [string]
+        [HttpGet("ProvByCod/{cod}")]
+        public ActionResult<Provincia> GetProvByCod (string cod)
+        {
+            var provincia = context.Provincias.Include(p => p.Pais).FirstOrDefault(
+                p => p.CodProv == cod);
+            if (provincia== null)
+            {
+                return NotFound();
+            }
+            return provincia;
+        }
+
 
         [HttpPost]
         public ActionResult<Provincia> Post([FromBody]Provincia  provincia)
@@ -48,9 +61,34 @@ namespace Api.WebAPi.Controllers
             //await context.Provincia.AddAsync(Provincia);
             context.SaveChanges();
             //await context.SaveChangesAsync();
-            return new CreatedAtRouteResult("obtenerProvinciaPorId", new { id = provincia.Id }, provincia);
+            return new CreatedAtRouteResult("ProvById", new { id = provincia.Id }, provincia);
             //return pais;
 
+        }
+
+        [HttpPut("{id}")]
+        public ActionResult<Provincia> Put(int id,[FromBody] Provincia provincia)
+        {
+            if (id!= provincia.Id)
+            {
+                return BadRequest();
+            }
+            context.Entry(provincia).State = EntityState.Modified;
+            context.SaveChanges();
+            return Ok();
+        }
+
+        [HttpDelete("{id}")]
+        public ActionResult<Provincia> Delete(int id)
+        {
+            var provincia = context.Provincias.FirstOrDefault(p => p.Id == id);
+            if (provincia == null)
+            {
+                return NotFound();
+            }
+            context.Provincias.Remove(provincia);
+            context.SaveChanges();
+            return Ok();
         }
     }
 }
