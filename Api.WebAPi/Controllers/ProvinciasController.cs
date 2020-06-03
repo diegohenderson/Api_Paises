@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Api.WebAPi.Controllers
 {
-    // api/provincias
     [Route("api/[controller]")]
     [ApiController]
     public class ProvinciasController : ControllerBase
@@ -27,52 +26,49 @@ namespace Api.WebAPi.Controllers
             return context.Provincias.Include(p => p.Pais).ToList();
         }
 
-        //api/provincias/ProvbyId/id. [int]
-        [HttpGet("ProvBy/{id}", Name = "ProvById")]
+        //   /api/provincias/ProvById/5
+        [HttpGet("ProvById/{id}", Name = "ProvById")]
         public ActionResult<Provincia> GetProvById(int id)
         {
             var provincia = context.Provincias.FirstOrDefault(p => p.Id == id);
             if (provincia == null)
             {
                 return NotFound();
-
             }
             return provincia;
         }
-        //api/provincias/GetProvByCod/cod [string]
+
+        //   /api/provincias/ProvByCod/x
         [HttpGet("ProvByCod/{cod}")]
-        public ActionResult<Provincia> GetProvByCod (string cod)
+        public ActionResult<Provincia> GetProvByCod(string cod)
         {
-            var provincia = context.Provincias.Include(p => p.Pais).FirstOrDefault(
-                p => p.CodProv == cod);
-            if (provincia== null)
+            var provincia = context
+                            .Provincias
+                            .Include(p => p.Pais).FirstOrDefault(p => p.CodProv == cod);
+            if (provincia == null)
             {
                 return NotFound();
             }
             return provincia;
         }
 
-
         [HttpPost]
-        public ActionResult<Provincia> Post([FromBody]Provincia  provincia)
-        //public async Task<ActionResult<Provincia>> Post([FromBody]Provincia provincia)
+        public ActionResult<Provincia> Post([FromBody] Provincia provincia)
         {
             context.Provincias.Add(provincia);
-            //await context.Provincia.AddAsync(Provincia);
             context.SaveChanges();
-            //await context.SaveChangesAsync();
-            return new CreatedAtRouteResult("ProvById", new { id = provincia.Id }, provincia);
-            //return pais;
 
+            return new CreatedAtRouteResult("ProvById", new { id = provincia.Id }, provincia);
         }
 
         [HttpPut("{id}")]
-        public ActionResult<Provincia> Put(int id,[FromBody] Provincia provincia)
+        public ActionResult<Provincia> Put(int id, [FromBody] Provincia provincia)
         {
-            if (id!= provincia.Id)
+            if (id != provincia.Id)
             {
                 return BadRequest();
             }
+
             context.Entry(provincia).State = EntityState.Modified;
             context.SaveChanges();
             return Ok();

@@ -9,15 +9,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Api.WebAPi.Controllers
 {
-    // api/paises
     [Route("api/[controller]")]
     [ApiController]
     public class PaisesController : ControllerBase
     {
         private readonly ApiContext context;
+
         public PaisesController(ApiContext context)
         {
-
             this.context = context;
         }
 
@@ -26,56 +25,68 @@ namespace Api.WebAPi.Controllers
         {
             return context.Paises.Include(p => p.Provincias).ToList();
         }
-        //nuevo con lamda
+
         [HttpGet("{id}", Name = "ObtenerPaisPorId")]
         public ActionResult<Pais> Get(int id)
         {
-            var pais = context.Paises.Include(p =>p.Provincias).FirstOrDefault(p => p.Id == id);
+            var pais = context.Paises.FirstOrDefault(p => p.Id == id);
             if (pais == null)
             {
                 return NotFound();
-
             }
             return pais;
         }
 
-
         [HttpPost]
-        //public ActionResult<Pais> Post([FromBody]Pais pais)
-        public async Task<ActionResult<Pais>> Post([FromBody]Pais pais)
+        //public ActionResult<Pais> Post([FromBody] Pais pais)
+        public async Task<ActionResult<Pais>> Post([FromBody] Pais pais)
         {
-            //context.Paises.Add(pais);
-            await context.Paises.AddAsync(pais);
-            //context.SaveChanges();
-            await context.SaveChangesAsync();
-            return new CreatedAtRouteResult("obtenerPaisPorId", new { id = pais.Id }, pais);
-            //return pais;
+            //if(!ModelState.IsValid)
+            //{
+            //    return BadRequest();
+            //}
 
+            //context.Paises.Add(pais);
+            //context.SaveChanges();
+
+            await context.Paises.AddAsync(pais);
+            await context.SaveChangesAsync();
+
+            //return pais;
+            return new CreatedAtRouteResult("ObtenerPaisPorId", new { id = pais.Id }, pais);
         }
-        //put
+
         [HttpPut("{id}")]
         public ActionResult<Pais> Put(int id, [FromBody] Pais pais)
         {
-            if (id!= pais.Id)
+            if (id != pais.Id)
             {
                 return BadRequest();
             }
+
             context.Entry(pais).State = EntityState.Modified;
             context.SaveChanges();
             return Ok();
-
         }
+
         [HttpDelete("{id}")]
-        public ActionResult<Pais>Delete(int id)
+        public ActionResult<Pais> Delete(int id)
         {
-            var pais = context.Paises.FirstOrDefault(p => p.Id == id);
-            if (pais==null)     
+            try
             {
-                return NotFound();
+                var pais = context.Paises.FirstOrDefault(p => p.Id == id);
+                if (pais == null)
+                {
+                    return NotFound();
+                }
+                context.Paises.Remove(pais);
+                context.SaveChanges();
+                return Ok();
             }
-            context.Paises.Remove(pais);
-            context.SaveChanges();
-            return Ok();
+            catch (Exception e)
+            {
+                return BadRequest();
+            }
         }
     }
 }
